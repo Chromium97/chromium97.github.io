@@ -9,47 +9,34 @@
   <script>
     AFRAME.registerComponent('flickable', {
       init: function () {
-        const el = this.el;
+        let el = this.el;
         let start = null;
-        let physicsBody = null;
-
-        // Wait for physics body to be ready
-        el.addEventListener('body-loaded', () => {
-          physicsBody = el.body;
-        });
-
-        // Record start of touch
+        // Start touch
         window.addEventListener('touchstart', (e) => {
           if (e.touches.length === 1) {
             start = e.touches[0];
           }
         });
-
-        // Detect flick and apply velocity
+        // End touch
         window.addEventListener('touchend', (e) => {
-          if (!start || !physicsBody) return;
-
+          if (!start) return;
           let end = e.changedTouches[0];
           let dx = end.clientX - start.clientX;
           let dy = end.clientY - start.clientY;
-
+          // Simple threshold for flick
           if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-            // Direction based on camera
-            const camera = document.querySelector('[camera]').object3D;
-            const forward = new THREE.Vector3();
-            camera.getWorldDirection(forward);
-            forward.normalize();
-
-            // Add forward force and arc
-            const velocity = new CANNON.Vec3(
-              forward.x * 2,
-              4,                    // upward arc
-              forward.z * 2
-            );
-
-            physicsBody.velocity.copy(velocity);
+            // Launch the ball forward
+            let pos = el.getAttribute('position');
+            let forward = new THREE.Vector3(0, 0, -1);
+            el.object3D.getWorldDirection(forward);
+            forward.multiplyScalar(2);
+            el.setAttribute('velocity', {
+              x: forward.x,
+              y: forward.y,
+              z: forward.z
+            });
+            el.setAttribute('dynamic-body', 'mass: 1'); // If using physics
           }
-
           start = null;
         });
       }
