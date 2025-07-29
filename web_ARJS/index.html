@@ -9,8 +9,11 @@
   <script>
     AFRAME.registerComponent('flickable', {
       init: function () {
-        let el = this.el;
+        const el = this.el;
         let start = null;
+
+        // Get the camera to aim
+        const camera = document.querySelector('[camera]');
 
         window.addEventListener('touchstart', (e) => {
           if (e.touches.length === 1) {
@@ -21,21 +24,32 @@
         window.addEventListener('touchend', (e) => {
           if (!start) return;
 
-          let end = e.changedTouches[0];
-          let dx = end.clientX - start.clientX;
-          let dy = end.clientY - start.clientY;
+          const end = e.changedTouches[0];
+          const dx = end.clientX - start.clientX;
+          const dy = end.clientY - start.clientY;
 
+          // Simple flick threshold
           if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-            // Get direction
-            let forward = new THREE.Vector3(0, 0, -1);
-            el.object3D.getWorldDirection(forward);
-            forward.multiplyScalar(3);
+            const cam = camera.object3D;
+            const forward = new THREE.Vector3();
+            cam.getWorldDirection(forward);
+            forward.normalize();
 
-            // Add upward arc
-            forward.y = 2;
+            // Apply forward velocity
+            const velocity = new CANNON.Vec3(
+              forward.x * 2,
+              3,               // Upward boost
+              forward.z * 2
+            );
 
-            // Apply physics velocity
-            el.body.velocity.set(forward.x, forward.y, forward.z);
+            // Delay slightly to ensure body is initialized
+            setTimeout(() => {
+              if (el.body) {
+                el.body.velocity.copy(velocity);
+              } else {
+                console.warn('Body not ready');
+              }
+            }, 100);
           }
 
           start = null;
@@ -58,8 +72,8 @@
       </a-entity>
     </a-marker>
 
-    <a-entity id="ball" geometry="primitive: sphere; radius: 0.1" material="color: red" position="0 -0.3 -1.5"
-      flickable>
+    <a-entity id="ball" geometry="primitive: sphere; radius: 0.1" material="color: orange" position="0 -0.3 -1.5"
+      dynamic-body flickable>
     </a-entity>
 
     <!-- Camera -->
