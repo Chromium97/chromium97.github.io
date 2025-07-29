@@ -7,42 +7,49 @@
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
   <script>
-    AFRAME.registerComponent('flickable', {
-      init: function () {
-        let el = this.el;
-        let start = null;
-        // Start touch
-        window.addEventListener('touchstart', (e) => {
-          if (e.touches.length === 1) {
-            start = e.touches[0];
-          }
-        });
-        // End touch
-        window.addEventListener('touchend', (e) => {
-          if (!start) return;
-          let end = e.changedTouches[0];
-          let dx = end.clientX - start.clientX;
-          let dy = end.clientY - start.clientY;
-          // Simple threshold for flick
-          if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-            // Launch the ball forward
-            let pos = el.getAttribute('position');
-            const camera = document.querySelector('[camera]').object3D;
-            const forward = new THREE.Vector3();
-            camera.getWorldDirection(forward);
-            forward.multiplyScalar(2);  // Positive = away from camera
-            el.setAttribute('velocity', {
-              x: forward.x,
-              y: forward.y,
-              z: forward.z
-            });
-            el.setAttribute('dynamic-body', 'mass: 1'); // If using physics
-          }
-          start = null;
-        });
-      }
-    });
-  </script>
+  AFRAME.registerComponent('flickable', {
+    init: function () {
+      let el = this.el;
+      let start = null;
+
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          start = e.touches[0];
+        }
+      });
+
+      window.addEventListener('touchend', (e) => {
+        if (!start) return;
+
+        let end = e.changedTouches[0];
+        let dx = end.clientX - start.clientX;
+        let dy = end.clientY - start.clientY;
+
+        // Only trigger on vertical flick
+        if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+          const camera = document.querySelector('[camera]').object3D;
+          const forward = new THREE.Vector3();
+          camera.getWorldDirection(forward);
+          forward.multiplyScalar(-2); // Invert to move away from camera
+
+          // Optional: Add arc
+          forward.y = 1.5;
+
+          el.setAttribute('velocity', {
+            x: forward.x,
+            y: forward.y,
+            z: forward.z
+          });
+
+          // Ensure dynamic-body is active
+          el.setAttribute('dynamic-body', 'mass: 1');
+        }
+
+        start = null;
+      });
+    }
+  });
+</script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
