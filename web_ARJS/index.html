@@ -32,8 +32,7 @@
           camera.getWorldDirection(forward);
           forward.multiplyScalar(-2); // Invert to move away from camera
 
-          // Optional: Add arc
-          forward.y = 1.5;
+
 
           el.setAttribute('velocity', {
             x: forward.x,
