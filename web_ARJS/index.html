@@ -7,18 +7,20 @@
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs>
-      <!-- Marker setup -->
-      <a-marker preset="hiro">
-          <a-assets>
-            <a-asset-item id="pokemon" src="assets/magnemite/scene.gltf"></a-asset-item>
-          </a-assets>
+      <!-- Assets -->
+      <a-assets>
+        <a-asset-item id="pokemon" src="assets/magnemite/scene.gltf"></a-asset-item>
+      </a-assets>
 
-          <!-- Instantiate the model -->
-          <a-entity 
-            gltf-model="#pokemon" 
-            scale="0.5 0.5 0.5" 
-            position="0 0 0">
-          </a-entity>
+      <!-- Marker with model -->
+      <a-marker preset="hiro">
+        <a-entity 
+          gltf-model="#pokemon" 
+          scale="0.5 0.5 0.5" 
+          position="0 0 0">
+        </a-entity>
+      </a-marker>
+
       <!-- Camera -->
       <a-entity camera></a-entity>
     </a-scene>
