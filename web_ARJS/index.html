@@ -1,80 +1,70 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>AR.js Hiro Marker Example</title>
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
-    <script>
-      AFRAME.registerComponent('flickable', {
-        init: function () {
-          let el = this.el;
-          let start = null;
 
-          // Start touch
-          window.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-              start = e.touches[0];
-            }
-          });
+<head>
+  <title>AR.js Hiro Marker Example</title>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
+  <script>
+    AFRAME.registerComponent('flickable', {
+      init: function () {
+        let el = this.el;
+        let start = null;
 
-          // End touch
-          window.addEventListener('touchend', (e) => {
-            if (!start) return;
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            start = e.touches[0];
+          }
+        });
 
-            let end = e.changedTouches[0];
-            let dx = end.clientX - start.clientX;
-            let dy = end.clientY - start.clientY;
+        window.addEventListener('touchend', (e) => {
+          if (!start) return;
 
-            // Simple threshold for flick
-            if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-              // Launch the ball forward
-              let pos = el.getAttribute('position');
-              let forward = new THREE.Vector3(0, 0, -1);
-              el.object3D.getWorldDirection(forward);
-              forward.multiplyScalar(-2);
+          let end = e.changedTouches[0];
+          let dx = end.clientX - start.clientX;
+          let dy = end.clientY - start.clientY;
 
-              el.setAttribute('velocity', {
-                x: forward.x,
-                y: forward.y,
-                z: forward.z
-              });
+          if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+            // Get direction
+            let forward = new THREE.Vector3(0, 0, -1);
+            el.object3D.getWorldDirection(forward);
+            forward.multiplyScalar(-3);
 
-              el.setAttribute('dynamic-body', 'mass: 1'); // If using physics
-            }
+            // Add upward arc
+            forward.y = 2;
 
-            start = null;
-          });
-        }
-      });
-</script>
-  </head>
-  <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs>
-      <!-- Assets -->
-      <a-assets>
-        <a-asset-item id="basketball_hoop" src="assets/basketball_hoop/scene.gltf"></a-asset-item>
-      </a-assets>
+            // Apply physics velocity
+            el.body.velocity.set(forward.x, forward.y, forward.z);
+          }
 
-      <!-- Marker with model -->
-      <a-marker preset="hiro">
-        <a-entity 
-          gltf-model="#basketball_hoop" 
-          scale="0.001 0.001 0.001" 
-          position="0 0 0"
-          rotation="270 180 180">
-        </a-entity>
-      </a-marker>
+          start = null;
+        });
+      }
+    });
+  </script>
+</head>
 
-      <a-entity id="ball"
-          geometry="primitive: sphere; radius: 0.1"
-          material="color: red"
-          position="0 -0.3 -1.5"
-          flickable>
+<body style="margin: 0; overflow: hidden;">
+  <a-scene embedded arjs>
+    <!-- Assets -->
+    <a-assets>
+      <a-asset-item id="basketball_hoop" src="assets/basketball_hoop/scene.gltf"></a-asset-item>
+    </a-assets>
+
+    <!-- Marker with model -->
+    <a-marker preset="hiro">
+      <a-entity gltf-model="#basketball_hoop" scale="0.001 0.001 0.001" position="0 0 0" rotation="270 180 180">
       </a-entity>
+    </a-marker>
 
-      <!-- Camera -->
-      <a-entity camera></a-entity>
-    </a-scene>
-  </body>
+    <a-entity id="ball" geometry="primitive: sphere; radius: 0.1" material="color: red" position="0 -0.3 -1.5"
+      flickable>
+    </a-entity>
+
+    <!-- Camera -->
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
+
 </html>
