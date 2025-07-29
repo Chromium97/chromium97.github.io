@@ -32,7 +32,7 @@
               let pos = el.getAttribute('position');
               let forward = new THREE.Vector3(0, 0, -1);
               el.object3D.getWorldDirection(forward);
-              forward.multiplyScalar(2);
+              forward.multiplyScalar(-2);
 
               el.setAttribute('velocity', {
                 x: forward.x,
