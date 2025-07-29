@@ -27,9 +27,10 @@
           if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
             // Launch the ball forward
             let pos = el.getAttribute('position');
-            let forward = new THREE.Vector3(0, 0, -1);
-            el.object3D.getWorldDirection(forward);
-            forward.multiplyScalar(2);
+            const camera = document.querySelector('[camera]').object3D;
+            const forward = new THREE.Vector3();
+            camera.getWorldDirection(forward);
+            forward.multiplyScalar(2);  // Positive = away from camera
             el.setAttribute('velocity', {
               x: forward.x,
               y: forward.y,
