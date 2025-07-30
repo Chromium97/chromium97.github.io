@@ -32,8 +32,6 @@
           camera.getWorldDirection(forward);
           forward.multiplyScalar(-2); // Invert to move away from camera
 
-
-
           el.setAttribute('velocity', {
             x: forward.x,
             y: forward.y,
@@ -43,7 +41,6 @@
           // Ensure dynamic-body is active
           el.setAttribute('dynamic-body', 'mass: 1');
         }
-
         start = null;
       });
     }
@@ -52,7 +49,7 @@
 </head>
 
 <body style="margin: 0; overflow: hidden;">
-  <a-scene embedded arjs>
+  <a-scene embedded arjs obb-collider="showColliders: true">
     <!-- Assets -->
     <a-assets>
       <a-asset-item id="basketball_hoop" src="assets/basketball_hoop/scene.gltf"></a-asset-item>
@@ -60,12 +57,12 @@
 
     <!-- Marker with model -->
     <a-marker preset="hiro">
-      <a-entity gltf-model="#basketball_hoop" scale="0.001 0.001 0.001" position="0 0 0" rotation="270 180 180">
+      <a-entity gltf-model="#basketball_hoop" scale="0.001 0.001 0.001" position="0 0 0" rotation="270 180 180" obb-collider>
       </a-entity>
     </a-marker>
 
     <a-entity id="ball" geometry="primitive: sphere; radius: 0.1" material="color: orange" position="0 -0.3 -1.5"
-      dynamic-body flickable>
+      dynamic-body flickable obb-collider>
     </a-entity>
 
     <!-- Camera -->
