@@ -61,9 +61,11 @@
         rotation="270 180 180" obb-collider static-body>
       </a-entity>
 
-      <a-box id="hoop-collider" position="0 0.5 0" scale="0.5 0.1 0.5" material="color: yellow" static-body>
-      </a-box>
+      
     </a-marker>
+
+   <a-box id="hoop-collider" position="0 0.5 0" scale="0.5 0.1 0.5"
+       material="color: yellow" static-body follow-marker></a-box>
 
     <a-entity id="ball" geometry="primitive: sphere; radius: 0.1" material="color: orange" position="0 -0.3 -1.5"
       dynamic-body flickable obb-collider>
@@ -76,7 +78,7 @@
   <script>
     AFRAME.registerComponent('collision-listener', {
       init: function () {
-        this.el.addEventListener('collide', function (e) {
+        this.el.addEventListener('collide', (e) => {
           console.log('Ball collided with:', e.detail.body.el);
 
           // Optional: check if the object hit is the hoop
@@ -94,6 +96,20 @@
       ball.setAttribute('collision-listener', '');
     });
   </script>
+
+  <script>
+AFRAME.registerComponent('follow-marker', {
+  tick: function () {
+    const marker = document.querySelector('#marker');
+    const markerObject3D = marker.object3D;
+    const collider = this.el.object3D;
+
+    // Copy position and rotation
+    collider.position.copy(markerObject3D.position);
+    collider.rotation.copy(markerObject3D.rotation);
+  }
+});
+</script>
 </body>
 
 </html>
