@@ -7,45 +7,45 @@
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
   <script>
-  AFRAME.registerComponent('flickable', {
-    init: function () {
-      let el = this.el;
-      let start = null;
+    AFRAME.registerComponent('flickable', {
+      init: function () {
+        let el = this.el;
+        let start = null;
 
-      window.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-          start = e.touches[0];
-        }
-      });
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            start = e.touches[0];
+          }
+        });
 
-      window.addEventListener('touchend', (e) => {
-        if (!start) return;
+        window.addEventListener('touchend', (e) => {
+          if (!start) return;
 
-        let end = e.changedTouches[0];
-        let dx = end.clientX - start.clientX;
-        let dy = end.clientY - start.clientY;
+          let end = e.changedTouches[0];
+          let dx = end.clientX - start.clientX;
+          let dy = end.clientY - start.clientY;
 
-        // Only trigger on vertical flick
-        if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-          const camera = document.querySelector('[camera]').object3D;
-          const forward = new THREE.Vector3();
-          camera.getWorldDirection(forward);
-          forward.multiplyScalar(-2); // Invert to move away from camera
+          // Only trigger on vertical flick
+          if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+            const camera = document.querySelector('[camera]').object3D;
+            const forward = new THREE.Vector3();
+            camera.getWorldDirection(forward);
+            forward.multiplyScalar(-2); // Invert to move away from camera
 
-          el.setAttribute('velocity', {
-            x: forward.x,
-            y: forward.y,
-            z: forward.z
-          });
+            el.setAttribute('velocity', {
+              x: forward.x,
+              y: forward.y,
+              z: forward.z
+            });
 
-          // Ensure dynamic-body is active
-          el.setAttribute('dynamic-body', 'mass: 1');
-        }
-        start = null;
-      });
-    }
-  });
-</script>
+            // Ensure dynamic-body is active
+            el.setAttribute('dynamic-body', 'mass: 1');
+          }
+          start = null;
+        });
+      }
+    });
+  </script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
@@ -57,8 +57,12 @@
 
     <!-- Marker with model -->
     <a-marker preset="hiro">
-      <a-entity id="hoop" gltf-model="#basketball_hoop" scale="0.001 0.001 0.001" position="0 0 0" rotation="270 180 180" obb-collider static-body>
+      <a-entity id="hoop" gltf-model="#basketball_hoop" scale="0.001 0.001 0.001" position="0 0 0"
+        rotation="270 180 180" obb-collider static-body>
       </a-entity>
+
+      <a-box id="hoop-collider" position="0 0.5 0" scale="0.5 0.1 0.5" material="color: yellow" static-body>
+      </a-box>
     </a-marker>
 
     <a-entity id="ball" geometry="primitive: sphere; radius: 0.1" material="color: orange" position="0 -0.3 -1.5"
@@ -70,26 +74,26 @@
   </a-scene>
 
   <script>
-  AFRAME.registerComponent('collision-listener', {
-    init: function () {
-      this.el.addEventListener('collide', function (e) {
-        console.log('Ball collided with:', e.detail.body.el);
-        
-        // Optional: check if the object hit is the hoop
-        if (e.detail.body.el && e.detail.body.el.id === 'hoop') {
-          console.log('Ball hit the hoop!');
-          this.el.setAttribute('material', 'color', 'red');
-        }
-      });
-    }
-  });
+    AFRAME.registerComponent('collision-listener', {
+      init: function () {
+        this.el.addEventListener('collide', function (e) {
+          console.log('Ball collided with:', e.detail.body.el);
 
-  // Wait for scene to load to attach the listener
-  document.addEventListener('DOMContentLoaded', () => {
-    const ball = document.querySelector('#ball');
-    ball.setAttribute('collision-listener', '');
-  });
-</script>
+          // Optional: check if the object hit is the hoop
+          if (e.detail.body.el && e.detail.body.el.id === 'hoop-collider') {
+            console.log('Ball hit the hoop!');
+            this.el.setAttribute('material', 'color', 'red');
+          }
+        });
+      }
+    });
+
+    // Wait for scene to load to attach the listener
+    document.addEventListener('DOMContentLoaded', () => {
+      const ball = document.querySelector('#ball');
+      ball.setAttribute('collision-listener', '');
+    });
+  </script>
 </body>
 
 </html>
