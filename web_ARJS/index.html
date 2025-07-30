@@ -78,7 +78,7 @@
         // Optional: check if the object hit is the hoop
         if (e.detail.body.el && e.detail.body.el.id === 'hoop') {
           console.log('Ball hit the hoop!');
-          el.setAttribute('material', 'color', 'red');
+          this.el.setAttribute('material', 'color', 'red');
         }
       });
     }
