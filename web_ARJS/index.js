@@ -3,33 +3,35 @@ AFRAME.registerComponent('flickable', {
     let el = this.el;
     let start = null;
 
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        start = e.touches[0];
-      }
-    });
+    // Wait until the physics body is loaded
+    el.addEventListener('body-loaded', () => {
+      console.log('Physics body loaded for', el.id);
 
-    window.addEventListener('touchend', (e) => {
-      if (!start) return;
-
-      let end = e.changedTouches[0];
-      let dx = end.clientX - start.clientX;
-      let dy = end.clientY - start.clientY;
-
-      if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-        const camera = document.querySelector('[camera]').object3D;
-        const forward = new THREE.Vector3();
-        camera.getWorldDirection(forward);
-        forward.multiplyScalar(-2);
-
-        // Directly set velocity using Cannon.js API
-        if (el.body) {
-          el.body.velocity.set(forward.x, forward.y, forward.z);
-        } else {
-          console.warn('Physics body not yet initialized.');
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          start = e.touches[0];
         }
-      }
-      start = null;
+      });
+
+      window.addEventListener('touchend', (e) => {
+        if (!start) return;
+
+        let end = e.changedTouches[0];
+        let dx = end.clientX - start.clientX;
+        let dy = end.clientY - start.clientY;
+
+        if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+          const camera = document.querySelector('[camera]').object3D;
+          const forward = new THREE.Vector3();
+          camera.getWorldDirection(forward);
+          forward.multiplyScalar(-2);
+
+          // Now safe to access el.body
+          el.body.velocity.set(forward.x, forward.y, forward.z);
+        }
+
+        start = null;
+      });
     });
   }
 });
